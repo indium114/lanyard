@@ -54,5 +54,8 @@ func bootstrap() (string, string) {
 
 func main() {
 	sock, pid := bootstrap()
-	fmt.Println("Socket is " + sock + "; PID is " + pid)
+	path := internal.StateDir() + "/activate.nu"
+
+	nuScript := fmt.Sprintf("$env.SSH_AUTH_SOCKET=%s\n$env.SSH_AGENT_PID=%s\n", sock, pid)
+	os.WriteFile(path, []byte(nuScript), 0o700)
 }
