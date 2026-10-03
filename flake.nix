@@ -32,7 +32,7 @@
 
         packages.lanyard = pkgs.buildGoModule {
           pname = "lanyard";
-          version = "0.1.0";
+          version = "0.1.1";
 
           src = self;
 
