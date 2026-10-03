@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/charmbracelet/huh"
 	"github.com/indium114/lanyard/internal"
 )
 
@@ -58,4 +59,24 @@ func main() {
 
 	nuScript := fmt.Sprintf("$env.SSH_AUTH_SOCKET=%s\n$env.SSH_AGENT_PID=%s\n", sock, pid)
 	os.WriteFile(path, []byte(nuScript), 0o700)
+
+	// confirm whether or not to add keys
+	var confirm bool
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Unlock Keys?").
+				Affirmative("Yes").
+				Negative("No").
+				Value(&confirm),
+		),
+	)
+	err := form.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if confirm {
+		fmt.Println("Placeholder!")
+	}
 }
