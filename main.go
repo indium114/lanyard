@@ -57,7 +57,7 @@ func main() {
 	sock, pid := bootstrap()
 	path := internal.StateDir() + "/activate.nu"
 
-	nuScript := fmt.Sprintf("$env.SSH_AUTH_SOCK = \"%s\"\n$env.SSH_AGENT_PID = \"%s\"\n", sock, pid)
+	nuScript := fmt.Sprintf("{SSH_AGENT_PID: \"%s\", SSH_AUTH_SOCK: \"%s\"}", sock, pid)
 	os.WriteFile(path, []byte(nuScript), 0o700)
 
 	// confirm whether or not to add keys
@@ -98,7 +98,7 @@ func main() {
 
 		for _, key := range keys {
 			cmd := exec.Command("ssh-add", home+"/.ssh/"+key)
-			cmd.Stdout = os.Stdout
+			cmd.Stdout = os.Stderr
 			cmd.Stdin = os.Stdin
 			cmd.Stderr = os.Stderr
 			cmd.Env = append(cmd.Env, "SSH_AUTH_SOCK="+sock, "SSH_AGENT_PID="+pid)
