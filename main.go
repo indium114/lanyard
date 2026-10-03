@@ -14,7 +14,7 @@ import (
 )
 
 func startAgent() (string, string) {
-	_ = os.Remove(internal.StateDir() + "/agent.sock")
+	_ = os.RemoveAll(internal.StateDir())
 	cmd := exec.Command("ssh-agent", "-a", internal.StateDir()+"/agent.sock")
 	outBytes, err := cmd.Output()
 	out := string(outBytes)
