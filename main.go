@@ -61,6 +61,9 @@ func main() {
 	os.WriteFile(path, []byte(nuScript), 0o700)
 
 	// confirm whether or not to add keys
+	if len(internal.LoadConfig()) == len(internal.ReadUnlocked()) {
+		os.Exit(0)
+	}
 	var confirm bool
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -77,6 +80,32 @@ func main() {
 	}
 
 	if confirm {
-		fmt.Println("Placeholder!")
+		home, _ := os.UserHomeDir()
+
+		var keys []string
+		for _, configuredKey := range internal.LoadConfig() {
+			found := false
+			for _, unlockedKey := range internal.ReadUnlocked() {
+				if configuredKey == unlockedKey {
+					found = true
+					break
+				}
+			}
+			if !found {
+				keys = append(keys, configuredKey)
+			}
+		}
+
+		for _, key := range keys {
+			cmd := exec.Command("ssh-add", home+"/.ssh/"+key)
+			cmd.Stdout = os.Stdout
+			cmd.Stdin = os.Stdin
+			cmd.Stderr = os.Stderr
+			cmd.Env = append(cmd.Env, "SSH_AUTH_SOCK="+sock, "SSH_AGENT_PID="+pid)
+
+			if err := cmd.Run(); err == nil {
+				internal.WriteUnlocked(append(internal.ReadUnlocked(), key))
+			}
+		}
 	}
 }
