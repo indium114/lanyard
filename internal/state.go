@@ -7,7 +7,7 @@ import (
 )
 
 func StateDir() string {
-	home, err := os.UserConfigDir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
