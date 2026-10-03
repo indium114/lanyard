@@ -6,11 +6,18 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
-      in {
+      in
+      {
         devShells.default = pkgs.mkShell {
           name = "go-devshell";
 
@@ -32,7 +39,15 @@
           vendorHash = "sha256-UdRyylHSZ/b89cEArilaw6LcAw0epmpH6yCOKOiw9Gw=";
 
           subPackages = [ "." ];
-          ldflags = [ "-s" "-w" ];
+          ldflags = [
+            "-s"
+            "-w"
+          ];
+
+          postInstall = ''
+            mkdir -p $out/share/lanyard
+            cp shell/lanyard.nu $out/share/lanyard/lanyard.nu
+          '';
 
           meta = with pkgs.lib; {
             description = "Manager for ssh-agent and keys";
@@ -45,5 +60,9 @@
           type = "app";
           program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.lanyard}/bin/lanyard";
         };
-      });
+      }
+    )
+    // {
+      homeModules.default = import ./home.nix { inherit self; };
+    };
 }
