@@ -57,7 +57,7 @@ func main() {
 	sock, pid := bootstrap()
 	path := internal.StateDir() + "/activate.nu"
 
-	nuScript := fmt.Sprintf("{SSH_AGENT_PID: \"%s\", SSH_AUTH_SOCK: \"%s\"}", sock, pid)
+	nuScript := fmt.Sprintf("{SSH_AGENT_PID: \"%s\", SSH_AUTH_SOCK: \"%s\"}", pid, sock)
 	os.WriteFile(path, []byte(nuScript), 0o700)
 
 	// confirm whether or not to add keys
