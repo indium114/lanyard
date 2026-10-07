@@ -59,8 +59,14 @@ func main() {
 	sock, pid := bootstrap()
 	path := internal.StateDir() + "/activate.nu"
 
-	nuScript := fmt.Sprintf("{SSH_AGENT_PID: \"%s\", SSH_AUTH_SOCK: \"%s\"}", pid, sock)
+	nuScript := fmt.Sprintf("{SSH_AUTH_SOCK: \"%s\", SSH_AGENT_PID: \"%s\"}", sock, pid)
 	os.WriteFile(path, []byte(nuScript), 0o700)
+
+	// MARK: 'wipe' subcommand to remove all unlocked keys from the agent
+	if len(os.Args) > 1 && os.Args[1] == "wipe" {
+		internal.Wipe(sock, pid)
+		os.Exit(0)
+	}
 
 	// confirm whether or not to add keys
 	if len(internal.LoadConfig()) == len(internal.ReadUnlocked()) {
